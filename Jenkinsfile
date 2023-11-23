@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: "${params.branch_name}", url: "  "
+                git branch: "${params.branch_name}", url: "https://github.com/shivayogi-31/Jenkins_assign.git"
             }
         }
 
