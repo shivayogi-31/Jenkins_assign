@@ -1,23 +1,65 @@
-pipeline{
-	agent { label 'slave-2'}
-	stages{
-        stage('Build stage') {
+
+pipeline {
+    agent any
+
+    parameters {
+        choice choices: ['Dev', 'QA', 'UAT', 'Prod'], description: 'Select the environment', name: 'branch_name'
+    }
+
+    stages {
+        stage('Checkout') {
             steps {
-                echo 'This is a build stage'
-				sh 'sleep 5'
-			}
-		}
-        stage('Push stage') {
+                git branch: "${params.branch_name}", url: "  "
+            }
+        }
+
+        stage('Build') {
             steps {
-                echo 'This is push stage'
-                sh 'sleep 5'
-			}
-		}
-        stage('Deploy stage') {
+                script {
+                    // Run build stage
+                    sh 'mvn clean package'
+                }
+            }
+        }
+
+        stage('Test') {
+            when {
+                // Run test stage only for QA, UAT, and Prod branches
+                expression { return params.branch_name ==~ /(QA|UAT|Prod)/ }
+            }
             steps {
-                echo 'This is deploy stage'
-                sh 'sleep 5'
-			}
-		}
-	}
-}	
+                script {
+                    // Run test stage
+                    sh 'mvn test'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            when {
+                // Run deploy stage only for UAT and Prod branches
+                expression { return params.branch_name ==~ /(UAT|Prod)/ }
+            }
+            steps {
+                script {
+                    // Run deploy stage
+                    sh 'mvn install'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                sh 'chmod +x script.sh'
+                sh './script.sh'
+            }
+           
+            // Clean up workspace
+           cleanWs()
+        
+        }
+    }
+}
+
