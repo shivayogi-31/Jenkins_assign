@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -9,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: "${params.branch_name}", url: "https://github.com/shivayogi-31/Jenkins_assign.git"
+                git branch: "${params.branch_name}", url: "https://github.com/sachin-jk/jenkins_assignment.git"
             }
         }
 
@@ -62,4 +61,3 @@ pipeline {
         }
     }
 }
-
